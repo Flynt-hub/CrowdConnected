@@ -47,10 +47,8 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity
 {
 
-    private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-    private Button mNavActivityButton;
-
+    private CrowdConnected mCrowdConnected;
     private Button mLocationButton;
     private TextView mLatitudeView, mLongitudeView, mAltitudeView;
     private final Context mContext = this;
@@ -78,32 +76,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-//        setSupportActionBar(binding.toolbar);
-
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-//        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-//        mNavActivityButton = this.findViewById( R.id.navButton );
-//        mNavActivityButton.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View view)
-//            {
-//                startActivity(new Intent(MainActivity.this, NavActivity.class ));
-//            }
-//        });
-//
-//        binding.fab.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View view)
-//            {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
 
         mLocationButton = findViewById( R.id.button_get_position );
         mLatitudeView = findViewById( R.id.positionLatText );
@@ -149,6 +121,7 @@ public class MainActivity extends AppCompatActivity
 //                    }
 //                }
 //            });
+            mMapView.setFocusOnMap(); // close other view components such as the navigation, the search view or the place info view...
             startCrowdConnected();
         }
         else
@@ -177,10 +150,10 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onStartUpSuccess()
                     {
-                        CrowdConnected crowdConnected = CrowdConnected.getInstance();
-                        if ( crowdConnected != null )
+                        mCrowdConnected = CrowdConnected.getInstance();
+                        if ( mCrowdConnected != null )
                         {
-                            crowdConnected.registerPositionCallback( lPosition ->
+                            mCrowdConnected.registerPositionCallback( lPosition ->
                             {
                                 Location lAndroidLocation = new Location("");
 
@@ -190,7 +163,7 @@ public class MainActivity extends AppCompatActivity
 
                                 mLatitudeView.setText( Double.toString( lAndroidLocation.getLongitude() ) );
                                 mLongitudeView.setText( Double.toString( lAndroidLocation.getLongitude() ) );
-                                mAltitudeView.setText( Double.toString( lAndroidLocation.getAltitude() ) );
+                                mAltitudeView.setText( mCrowdConnected.getDeviceId() );
 
                                 mMapView.updateLocation( mMapView.createLocationFromLocation( lAndroidLocation ) );
                             });
@@ -203,35 +176,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
+    protected void onPause()
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
+        super.onPause();
+        if( mCrowdConnected != null )
         {
-            return true;
+            mCrowdConnected.stopNavigation();
         }
-
-        return super.onOptionsItemSelected(item);
+        mMapView.onPause();
     }
 
     @Override
-    public boolean onSupportNavigateUp()
+    protected void onResume()
     {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
+        super.onResume();
+        if( mCrowdConnected != null )
+        {
+            mCrowdConnected.startNavigation();
+        }
+        mMapView.onResume();
     }
 }
