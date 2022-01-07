@@ -40,6 +40,7 @@ import net.crowdconnected.android.core.Configuration;
 import net.crowdconnected.android.core.ConfigurationBuilder;
 import net.crowdconnected.android.core.CrowdConnected;
 import net.crowdconnected.android.core.StatusCallback;
+import net.crowdconnected.android.core.modules.Surface;
 import net.crowdconnected.android.ips.IPSModule;
 
 import java.util.Map;
@@ -54,99 +55,113 @@ public class MainActivity extends AppCompatActivity
     private final Context mContext = this;
     private FusedLocationProviderClient mFusedLocationClient;
     private VMEMapView mMapView;
-    private final ActivityResultLauncher<String[]> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), lPermissionMap ->
+    private final ActivityResultLauncher< String[] > requestPermissionLauncher =
+            registerForActivityResult( new ActivityResultContracts.RequestMultiplePermissions(), lPermissionMap ->
             {
                 boolean lOk = true;
-                for (Map.Entry<String, Boolean> lEntry : lPermissionMap.entrySet())
+                for ( Map.Entry< String, Boolean > lEntry : lPermissionMap.entrySet() )
                 {
-                    if (!lEntry.getValue())
+                    if ( ! lEntry.getValue() )
                     {
                         lOk = false;
                         break;
                     }
                 }
-                if (lOk) getLocation();
-                else {mAltitudeView.setText("permission not granted");};
-            });
+                if ( lOk ) showLocation();
+                else { mAltitudeView.setText( "permission not granted" ); };
+            } );
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    protected void onCreate( Bundle savedInstanceState )
     {
-        super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        super.onCreate( savedInstanceState );
+        binding = ActivityMainBinding.inflate( getLayoutInflater() );
+        setContentView( binding.getRoot() );
 
         mLocationButton = findViewById( R.id.button_get_position );
         mLatitudeView = findViewById( R.id.positionLatText );
         mLongitudeView = findViewById( R.id.positionLonText );
         mAltitudeView = findViewById( R.id.positionAltText );
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient( this );
 
-        mMapView = (VMEMapView) findViewById(R.id.mapView);
+        mMapView = (VMEMapView) findViewById( R.id.mapView );
         mMapView.setLocationTrackingMode( VMELocationTrackingMode.FOLLOW );
         mMapView.loadMap();
 
         this.mLocationButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view)
+            public void onClick( View view )
             {
-                getLocation();
+                showLocation();
             }
         });
     }
 
-    private void getLocation()
+    @Override
+    protected void onResume()
     {
-        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                &&
-                ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        super.onResume();
+        if( mCrowdConnected != null )
+            mCrowdConnected.startNavigation();
+        if( mMapView != null )
+            mMapView.onResume();
+        showLocation();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if( mCrowdConnected != null )
+            mCrowdConnected.stopNavigation();
+        if( mMapView != null )
+            mMapView.onPause();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        if( mCrowdConnected != null )
+            mCrowdConnected.stop();
+        if( mMapView != null )
+            mMapView.unloadMap();
+    }
+
+
+    private void showLocation()
+    {
+        if ( ContextCompat.checkSelfPermission( mContext, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission( mContext, Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission( mContext, Manifest.permission.BLUETOOTH ) == PackageManager.PERMISSION_GRANTED )
         {
-//            mFusedLocationClient.getCurrentLocation( PRIORITY_HIGH_ACCURACY, null ).addOnSuccessListener((Activity) mContext, new OnSuccessListener<Location>()
-//            {
-//                @Override
-//                public void onSuccess(Location location)
-//                {
-//                    if (location != null)
-//                    {
-//                        Location lolo = new Location(location);
-//                        lolo.setAltitude(3);
-//                        VMELocation lVmeLocation = mMapView.createLocationFromLocation( lolo );
-//                        mMapView.updateLocation( lVmeLocation );
-//
-//                        mLatitudeView.setText( Double.toString( lVmeLocation.getPosition().getLatitude() ) );
-//                        mLongitudeView.setText( Double.toString( lVmeLocation.getPosition().getLongitude() ) );
-//                        mAltitudeView.setText( Double.toString( lolo.getAltitude() ) );
-//                    }
-//                }
-//            });
             mMapView.setFocusOnMap(); // close other view components such as the navigation, the search view or the place info view...
-            startCrowdConnected();
+            getLocation();
         }
         else
         {
-            requestPermissionLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
+            requestPermissionLauncher.launch( new String[]{ Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.BLUETOOTH } );
         }
     }
 
-    private void startCrowdConnected()
+    private void getLocation()
     {
         Configuration configuration = new ConfigurationBuilder()
 //                .withAppKey("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBLZXkiOiJhR3FGSnBBaCIsImlhdCI6MTYzOTM5MTMzNCwiZXhwIjoxNjQ2NjQ4OTM0fQ.vGlKEB2LrFWQuwrUkCSiQtLpR13YjtmlGIeEynRVYPw") // Crowd Connected App Key
-                .withAppKey("aGqFJpAh") // Crowd Connected App Key
-                .withToken("7ce30f4688d94e4bb93e0069a517c817") // Crowd Connected Token
-                .withSecret("z9e49L1L3p5N5I5u8L94N6E1DSwfY898") // Crowd Connected Secret
+                .withAppKey( "aGqFJpAh" ) // Crowd Connected App Key
+                .withToken( "7ce30f4688d94e4bb93e0069a517c817" ) // Crowd Connected Token
+                .withSecret( "z9e49L1L3p5N5I5u8L94N6E1DSwfY898" ) // Crowd Connected Secret
                 .withStatusCallback(new StatusCallback()
                 {
                     @SuppressLint("RestrictedApi")
                     @Override
-                    public void onStartUpFailure(String reason)
+                    public void onStartUpFailure( String reason )
                     {
-                        Log.e(LOG_TAG, "Start up failure: " + reason);
+                        Log.e( LOG_TAG, "Start up failure: " + reason );
                     }
 
-                    @SuppressLint("SetTextI18n")
+                    @SuppressLint( "SetTextI18n" )
                     @Override
                     public void onStartUpSuccess()
                     {
@@ -173,27 +188,5 @@ public class MainActivity extends AppCompatActivity
                 .addModule( new IPSModule() )
                 .build();
         CrowdConnected.start( getApplication(), configuration );
-    }
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-        if( mCrowdConnected != null )
-        {
-            mCrowdConnected.stopNavigation();
-        }
-        mMapView.onPause();
-    }
-
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        if( mCrowdConnected != null )
-        {
-            mCrowdConnected.startNavigation();
-        }
-        mMapView.onResume();
     }
 }
