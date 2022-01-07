@@ -47,14 +47,16 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:ems="10"
-            android:text="latitude" />
+            android:text="latitude"
+            android:layout_marginEnd="5sp"/>
         <TextView
             android:id="@+id/positionLonText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:ems="10"
-            android:text="longitude" />
+            android:text="longitude"
+            android:layout_marginEnd="5sp"/>
         <TextView
             android:id="@+id/positionAltText"
             android:layout_width="match_parent"
