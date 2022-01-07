@@ -20,6 +20,12 @@ import androidx.core.content.ContextCompat;
 import com.visioglobe.crowdconnected.databinding.ActivityMainBinding;
 import com.visioglobe.visiomoveessential.VMEMapView;
 import com.visioglobe.visiomoveessential.enums.VMELocationTrackingMode;
+import com.visioglobe.visiomoveessential.models.VMECameraDistanceRange;
+import com.visioglobe.visiomoveessential.models.VMECameraHeading;
+import com.visioglobe.visiomoveessential.models.VMECameraPitch;
+import com.visioglobe.visiomoveessential.models.VMECameraUpdate;
+import com.visioglobe.visiomoveessential.models.VMECameraUpdateBuilder;
+import com.visioglobe.visiomoveessential.models.VMELocation;
 
 import android.widget.TextView;
 
@@ -29,12 +35,11 @@ import net.crowdconnected.android.core.CrowdConnected;
 import net.crowdconnected.android.core.StatusCallback;
 import net.crowdconnected.android.ips.IPSModule;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
 {
-
-    private ActivityMainBinding binding;
     private CrowdConnected mCrowdConnected;
     private TextView mLatitudeView, mLongitudeView, mAltitudeView;
     private final Context mContext = this;
@@ -59,15 +64,15 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        binding = ActivityMainBinding.inflate( getLayoutInflater() );
-        setContentView( binding.getRoot() );
+        setContentView( ActivityMainBinding.inflate( getLayoutInflater() ).getRoot() );
 
         mLatitudeView = findViewById( R.id.positionLatText );
         mLongitudeView = findViewById( R.id.positionLonText );
         mAltitudeView = findViewById( R.id.positionAltText );
 
         mMapView = (VMEMapView) findViewById( R.id.mapView );
-        mMapView.setLocationTrackingMode( VMELocationTrackingMode.FOLLOW );
+        mMapView.setLocationTrackingMode( VMELocationTrackingMode.CUSTOM );
+//        mMapView.setSelectorViewVisible( false );
         mMapView.loadMap();
     }
 
@@ -144,15 +149,47 @@ public class MainActivity extends AppCompatActivity
                             {
                                 Location lAndroidLocation = new Location("");
 
-                                lAndroidLocation.setAltitude( 3 );
-                                lAndroidLocation.setLongitude( lPosition.getLongitude() );
-                                lAndroidLocation.setLatitude( lPosition.getLatitude() );
+                                final double lScale = Math.pow( 10, 3 );
+                                double lLatitude = Math.round( lPosition.getLatitude() * lScale ) / lScale;
+                                double lLongitude = Math.round( lPosition.getLongitude() * lScale ) / lScale;
 
-                                mLatitudeView.setText( Double.toString( lAndroidLocation.getLongitude() ) );
-                                mLongitudeView.setText( Double.toString( lAndroidLocation.getLongitude() ) );
+                                // this have to be set manually because crowdConnected only use 2D floor map
+                                lAndroidLocation.setAltitude( 3 );// hint : register all crowdConnected beacons IDs to determine on which floor you're located => mCrowdConnected.getDeviceId()
+                                lAndroidLocation.setLongitude( lLongitude );
+                                lAndroidLocation.setLatitude( lLatitude );
+
+
+                                mLatitudeView.setText( Double.toString( lLatitude ) );
+                                mLongitudeView.setText( Double.toString( lLongitude ) );
                                 mAltitudeView.setText( mCrowdConnected.getDeviceId() );
 
-                                mMapView.updateLocation( mMapView.createLocationFromLocation( lAndroidLocation ) );
+                                lAndroidLocation.setAccuracy( 2.f );// TODO change this value for something relevant
+
+                                VMELocation lVMELocation = mMapView.createLocationFromLocation( lAndroidLocation );
+
+                                // custom location tracker
+                                VMECameraHeading lCameraHeading;
+                                if( null != lVMELocation )
+                                {
+                                    if ( lVMELocation.getBearing() < 0 )
+                                    {
+                                        lCameraHeading = VMECameraHeading.newCurrent();
+                                    }
+                                    else
+                                    {
+                                        lCameraHeading = VMECameraHeading.newHeading( lVMELocation.getBearing() );
+//                                        lCameraHeading = VMECameraHeading.newHeading( 20.f );
+                                    }
+                                    VMECameraUpdate lCameraUpdate = new VMECameraUpdateBuilder()
+                                            .setTargets( Arrays.asList( lVMELocation.getPosition() ) )
+                                            .setHeading( lCameraHeading )
+                                            .setPitch( VMECameraPitch.newPitch( -50 ) )
+//                                            .setDistanceRange( VMECameraDistanceRange.newAltitudeRange( 1, 5 ) )
+                                            .setDistanceRange( VMECameraDistanceRange.newRadiusRange( 7.f, 9.f ) )
+                                            .build();
+                                    mMapView.animateCamera( lCameraUpdate, 0.5f, null );
+                                    mMapView.updateLocation( lVMELocation );
+                                }
                             });
                         }
                     }
