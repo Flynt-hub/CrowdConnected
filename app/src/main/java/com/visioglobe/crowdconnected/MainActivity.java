@@ -5,42 +5,28 @@ import static androidx.core.content.PackageManagerCompat.LOG_TAG;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
-import android.view.View;
 
 import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import com.visioglobe.crowdconnected.databinding.ActivityMainBinding;
 import com.visioglobe.visiomoveessential.VMEMapView;
 import com.visioglobe.visiomoveessential.enums.VMELocationTrackingMode;
 
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.TextView;
 
 import net.crowdconnected.android.core.Configuration;
 import net.crowdconnected.android.core.ConfigurationBuilder;
 import net.crowdconnected.android.core.CrowdConnected;
 import net.crowdconnected.android.core.StatusCallback;
-import net.crowdconnected.android.core.modules.Surface;
 import net.crowdconnected.android.ips.IPSModule;
 
 import java.util.Map;
@@ -50,10 +36,8 @@ public class MainActivity extends AppCompatActivity
 
     private ActivityMainBinding binding;
     private CrowdConnected mCrowdConnected;
-    private Button mLocationButton;
     private TextView mLatitudeView, mLongitudeView, mAltitudeView;
     private final Context mContext = this;
-    private FusedLocationProviderClient mFusedLocationClient;
     private VMEMapView mMapView;
     private final ActivityResultLauncher< String[] > requestPermissionLauncher =
             registerForActivityResult( new ActivityResultContracts.RequestMultiplePermissions(), lPermissionMap ->
@@ -78,24 +62,13 @@ public class MainActivity extends AppCompatActivity
         binding = ActivityMainBinding.inflate( getLayoutInflater() );
         setContentView( binding.getRoot() );
 
-        mLocationButton = findViewById( R.id.button_get_position );
         mLatitudeView = findViewById( R.id.positionLatText );
         mLongitudeView = findViewById( R.id.positionLonText );
         mAltitudeView = findViewById( R.id.positionAltText );
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient( this );
 
         mMapView = (VMEMapView) findViewById( R.id.mapView );
         mMapView.setLocationTrackingMode( VMELocationTrackingMode.FOLLOW );
         mMapView.loadMap();
-
-        this.mLocationButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick( View view )
-            {
-                showLocation();
-            }
-        });
     }
 
     @Override
@@ -148,7 +121,6 @@ public class MainActivity extends AppCompatActivity
     private void getLocation()
     {
         Configuration configuration = new ConfigurationBuilder()
-//                .withAppKey("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBLZXkiOiJhR3FGSnBBaCIsImlhdCI6MTYzOTM5MTMzNCwiZXhwIjoxNjQ2NjQ4OTM0fQ.vGlKEB2LrFWQuwrUkCSiQtLpR13YjtmlGIeEynRVYPw") // Crowd Connected App Key
                 .withAppKey( "aGqFJpAh" ) // Crowd Connected App Key
                 .withToken( "7ce30f4688d94e4bb93e0069a517c817" ) // Crowd Connected Token
                 .withSecret( "z9e49L1L3p5N5I5u8L94N6E1DSwfY898" ) // Crowd Connected Secret
