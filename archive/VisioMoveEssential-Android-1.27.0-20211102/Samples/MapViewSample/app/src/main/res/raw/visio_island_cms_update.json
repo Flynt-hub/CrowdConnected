@@ -1,0 +1,27 @@
+{
+    "locale": {
+        "en": {
+            "places": {
+                "B1-UL00-ID0034": {
+                    "name": "Renoir Exhibition",
+                    "description":"https://en.m.wikipedia.org/wiki/Pierre-Auguste_Renoir"
+                },
+                "B1-UL00-ID0038": {
+                    "name": "PAUL Extra",
+                    "description":"https://en.wikipedia.org/wiki/Paul_(bakery)",
+                    "icon":"media\/map\/visio_island_essentials\/restaurant.png",
+                    "categories": [
+                        "2", "3", "99"
+                    ]
+                }
+            },
+            "categories": {
+                "99": {
+                    "name": "Information",
+                    "icon": "media/map/visio_island_essentials/service.png"
+                }
+            }
+        }
+    },
+    "version": 1
+}

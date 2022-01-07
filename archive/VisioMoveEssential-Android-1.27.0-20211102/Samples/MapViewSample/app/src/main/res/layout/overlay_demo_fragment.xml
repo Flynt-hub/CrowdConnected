@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/overlay_demo_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TableRow>
+            <ToggleButton
+                android:id="@+id/overlay_toggle"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textOff="@string/toggle_overlays"
+                android:textOn="@string/toggle_overlays"/>
+            <Button
+                android:id="@+id/move_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/move_overlay"/>
+        </TableRow>
+    </TableLayout>
+
+    <!-- VisioIsland official -->
+    <com.visioglobe.visiomoveessential.VMEMapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center|center_vertical|center_horizontal"
+        android:layout_weight="1"
+        app:mapHash="mc8f3fec89d2b7283d15cfcf4eb28a0517428f054"
+        app:mapPath="asset://map_bundle.zip"
+        app:mapSecretCode="0"/>
+
+
+</LinearLayout>

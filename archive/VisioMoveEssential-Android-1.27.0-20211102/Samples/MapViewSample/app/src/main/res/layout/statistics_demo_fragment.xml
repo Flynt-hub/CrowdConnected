@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/statistics_demo_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TableRow>
+            <ToggleButton
+                android:id="@+id/gps_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textOff="@string/toggle_location"
+                android:textOn="@string/toggle_location"/>
+            <Button
+                android:id="@+id/simulate_location_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/simulate_location"
+                android:layout_weight="1" />
+            <ToggleButton
+                android:id="@+id/place_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textOff="@string/toggle_cat_tracker"
+                android:textOn="@string/toggle_cat_tracker"/>
+        </TableRow>
+    </TableLayout>
+    <!-- VisioIsland official -->
+    <com.visioglobe.visiomoveessential.VMEMapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center|center_vertical|center_horizontal"
+        android:layout_weight="1"
+        app:mapHash="mc8f3fec89d2b7283d15cfcf4eb28a0517428f054"
+        app:mapPath="asset://map_bundle.zip"
+        app:mapSecretCode="0"/>
+</LinearLayout>

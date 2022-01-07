@@ -1,0 +1,11 @@
+Sail silvaco map, floor 1: 
+    Uuid : 021de550-5837-11ec-bf63-0242ac130002
+    major : 861
+    minor : 900
+    batch : visioBatch
+    
+    SDK credentials : 
+    	Api key : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBLZXkiOiJhR3FGSnBBaCIsImlhdCI6MTYzOTM5MTMzNCwiZXhwIjoxNjQ2NjQ4OTM0fQ.vGlKEB2LrFWQuwrUkCSiQtLpR13YjtmlGIeEynRVYPw
+    	Token: 7ce30f4688d94e4bb93e0069a517c817
+    	Secret: z9e49L1L3p5N5I5u8L94N6E1DSwfY898
+    	
