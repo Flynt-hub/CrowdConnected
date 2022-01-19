@@ -37,7 +37,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.3.5'
     implementation 'androidx.navigation:navigation-ui:2.3.5'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
-    implementation fileTree(dir: '../archive/VisioMoveEssential-Android-1.27.0-20211102/', include: ['*.aar', '*.jar'], exclude: [])
+    implementation fileTree(dir: '../archive/', include: ['*.aar', '*.jar'], exclude: [])
     implementation 'com.google.android.gms:play-services-location:18.0.0'
     implementation 'net.crowdconnected.android.core:android-core:1.1.2'
     implementation 'net.crowdconnected.android.ips:android-ips:1.1.2'

@@ -126,9 +126,9 @@ public class MainActivity extends AppCompatActivity
     private void getLocation()
     {
         Configuration configuration = new ConfigurationBuilder()
-                .withAppKey( "aGqFJpAh" ) // Crowd Connected App Key
-                .withToken( "7ce30f4688d94e4bb93e0069a517c817" ) // Crowd Connected Token
-                .withSecret( "z9e49L1L3p5N5I5u8L94N6E1DSwfY898" ) // Crowd Connected Secret
+                .withAppKey( "your_api_token" ) // Crowd Connected App Key
+                .withToken( "your_crowd_connected_token" ) // Crowd Connected Token
+                .withSecret( "your_crowd_connected_secret" ) // Crowd Connected Secret
                 .withStatusCallback(new StatusCallback()
                 {
                     @SuppressLint("RestrictedApi")
@@ -149,19 +149,10 @@ public class MainActivity extends AppCompatActivity
                             {
                                 Location lAndroidLocation = new Location("");
 
-                                final double lScale = Math.pow( 10, 3 );
-                                double lLatitude = Math.round( lPosition.getLatitude() * lScale ) / lScale;
-                                double lLongitude = Math.round( lPosition.getLongitude() * lScale ) / lScale;
-
                                 // this have to be set manually because crowdConnected only use 2D floor map
                                 lAndroidLocation.setAltitude( 3 );// hint : register all crowdConnected beacons IDs to determine on which floor you're located => mCrowdConnected.getDeviceId()
-                                lAndroidLocation.setLongitude( lLongitude );
-                                lAndroidLocation.setLatitude( lLatitude );
-
-
-                                mLatitudeView.setText( Double.toString( lLatitude ) );
-                                mLongitudeView.setText( Double.toString( lLongitude ) );
-                                mAltitudeView.setText( mCrowdConnected.getDeviceId() );
+                                lAndroidLocation.setLongitude( lPosition.getLongitude() );
+                                lAndroidLocation.setLatitude( lPosition.getLatitude() );
 
                                 lAndroidLocation.setAccuracy( 2.f );// TODO change this value for something relevant
 

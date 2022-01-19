@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        app:mapHash="dev-m4c714d7765ba946c1d4ded319c871d312a16b495"
+        app:mapHash="ma10a386909f58fb12f8bbde9c3111c46077f485d"
         app:mapSecretCode="0" />
     <LinearLayout
         android:layout_width="wrap_content"
